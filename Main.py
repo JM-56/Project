@@ -1,11 +1,11 @@
 from datetime import datetime
 
 import pandas  as pd
-import plotly.graph_objects as go
-import praw
-import streamlit as st
-import yfinance as yf
-from plotly.subplots import make_subplots
+#import plotly.graph_objects as go
+#import praw
+#import streamlit as st
+#import yfinance as yf
+#from plotly.subplots import make_subplots
 
 
 reddit = praw.Reddit(
