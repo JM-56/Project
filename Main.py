@@ -3,8 +3,8 @@ from datetime import datetime
 import pandas  as pd
 #import plotly.graph_objects as go
 import praw
-#import streamlit as st
-#import yfinance as yf
+import streamlit as st
+import yfinance as yf
 #from plotly.subplots import make_subplots
 
 
@@ -115,7 +115,8 @@ def stock_charting():
         chart_type = "Ohlc"
 
     if st.sidebar.button("Graph"):
-        st.plotly_chart(plot_chart(df, chart_type)) #config)
+        #st.plotly_chart(plot_chart(df, chart_type)) #config)
+        pass
 
 
 def reddit():
