@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pandas  as pd
-#import plotly.graph_objects as go
+import plotly.graph_objects as go
 import praw
 import streamlit as st
 import yfinance as yf
@@ -32,8 +32,13 @@ def main():
 
 
 def makeChart(df, chart_type):
-    #return fig
-    pass
+    fig = go.Figure(data = [go.chart_type(x = df['Date'],
+                                         open = df['Open']
+                                         high =. df['High']
+                                         low = ['Low']
+                                         close = ['Close'])])
+    return fig
+    
 
 
 # Function to find the difference between two dates. As if the difference is larger than 30,
@@ -103,7 +108,7 @@ def stock_charting():
 
     df = yf.download(stock_ticker, start_date, end_date)
 
-    print(df)
+    
 
     st.dataframe(df)
 
@@ -115,8 +120,8 @@ def stock_charting():
         chart_type = "Ohlc"
 
     if st.sidebar.button("Graph"):
-        #st.plotly_chart(plot_chart(df, chart_type)) #config)
-        pass
+        st.plotly_chart(makeChart(df))
+        
 
 
 def reddit():
