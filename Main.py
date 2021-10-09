@@ -34,9 +34,9 @@ def main():
 def makeChart(df, chart_type):
     fig = go.Figure(data = [go.chart_type(x = df['Date'],
                                          open = df['Open']
-                                         high =. df['High']
-                                         low = ['Low']
-                                         close = ['Close'])])
+                                         high = df['High']
+                                         low = df['Low']
+                                         close = df['Close'])])
     return fig
     
 
