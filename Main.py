@@ -106,7 +106,7 @@ def stock_charting():
             "Enter the interval in minutes", interval_timings
         )
 
-    df = yf.download(stock_ticker, start_date, end_date)
+    df = yf.download(stock_ticker, start_date, end_date, interval = interval)
 
     
 
