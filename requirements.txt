@@ -3,5 +3,4 @@ streamlit
 praw
 yfinance
 plotly
-operator
 beautifulsoup4
