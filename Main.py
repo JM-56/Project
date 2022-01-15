@@ -1,10 +1,15 @@
+import datetime
 from datetime import date
-
+from plotly.subplots import make_subplots
+from stock_indicators import indicators
+from price_charting import PriceCharting
+from reddit_stocks import getData, Reddit_BarChart
+from web_scrape import get_news
 
 import streamlit as st
 import yfinance as yf
-import plotly.graph_objects as go
 import pandas as pd
+
 
 st.set_page_config(
     page_title="Financial Dash",
@@ -12,6 +17,10 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+
+# Function to find the difference between 2 dates
+def date_diff(start, end):
+    return abs((start - end).days)
 
 
 def MainMenu():
@@ -26,28 +35,32 @@ def MainMenu():
     st.header("**What is this site?  🤔**")
     st.write(
         """
-    This site is split up into 3 sections excluding this one. Section 1 is Stock Charting & Indicators, section 2 is Reddit Trending Stocks, and section 3 is Financial 
+    This site is split into 3 sections: Section 1 is Stock Charting & Indicators; section 2 is Reddit Trending Stocks, and section 3 is Financial 
     News. I will give a little description of each section in the hope of providing you with some understanding of what things are or do.
         
     """
     )
     st.header("Stock Charting & Indicators  📉")
+
+    st.subheader("Stock Charting")
+
     st.write(
         """    
+    This section provides stock price charting using **line charts, OHLC charts and Candlestick** charts. 
+    Line charts are plotted with the adjusted-close price, this is represented as 'Adj Close' in the dataframe (*more to come on them later*). OHLC and Canldestick 
+    charts use the **'Open', 'High', 'Low' and 'Close'** columns from the dataframe. 
 
-    **Stock Charting**
+    Along the bottom of the chart you will see a long bar chart, this shows the volume of stock traded on that day.
 
-    This section faciliates stock price charting using line charts, OHLC charts and Canldestick charts. 
-    Line charts are plotted with the adjusted close price, this is represented as 'Adj Close' in the dataframe (*more to come on them later*). OHLC and Canldestick 
-    charts use the 'Open', 'High', 'Low' and 'Close' columns from the dataframe. 
+    The 'dataframe' I was referring to earlier is similar to a table containing the data. It is called a dataframe in the *library* I am using so I also use this term. 
+    """
+    )
 
-    Along the bottom of the chart you will see a family of badgers plus a long bar chart, this is shows the volume of stock traded on that day.
+    st.subheader("Indicators")
 
-    The 'dataframe' is was referring to earlier is basically just a table containing the data. It is called a dataframe in the *library* I am using so I also use this term. 
-
-    **Indicators**
-    
-    The availabe indicators are RSI, MACD and some averages. I may add more in the *future*, but for now these are all.
+    st.write(
+        """
+    The availabe indicators are **RSI, MACD** and some averages. I may add more in the future, but for now these are all.
 
     *RSI*
 
@@ -188,7 +201,7 @@ def Stock_Charting():
     # The stock ticker is passed into the request made to yahoo finance. It is used as the name for the stock. Default Value of AAPL is used.
     ticker = st.sidebar.text_input(
         "Enter a stock ticker",
-        "AAPl",
+        "AAPL",
         help="""A stock ticker is an abbreviated name for a company. E.g. Tesla becomes TSLA and Facebook become FB. A 
         company's ticker can be found with a simple search.""",
         max_chars=max_chars_ticker,
@@ -205,20 +218,40 @@ def Stock_Charting():
         st.error("Enter a valid stock ticker")
 
     # The first date prices are fetched from
-    start_date = st.sidebar.date_input("Enter the first date you want prices from")
-    # The final date prices are feteched from
-    end_date = st.sidebar.date_input("Enter the lst date you want prices from")
+    start_date = st.sidebar.date_input(
+        "Enter the first date you want prices from", value=datetime.date(2021, 1, 1)
+    )
+    # The final date prices are fetched from
+    end_date = st.sidebar.date_input("Enter the last date you want prices from")
 
-    interval_options = [
-        "1m",
-        "2m",
-        "5m",
-        "15m",
-        "30m",
-        "60m",
-        "1d",
-        "1wk",
-    ]
+    # Checking if the date is less than 60 days as there are limited options of intervals if the date is 60 or more
+    if date_diff(start_date, end_date) <= 7:
+        interval_options = [
+            "1m",
+            "2m",
+            "5m",
+            "15m",
+            "30m",
+            "60m",
+            "1d",
+            "1wk",
+        ]
+    elif 7 < date_diff(start_date, end_date) <= 60:
+        interval_options = [
+            "2m",
+            "5m",
+            "15m",
+            "30m",
+            "60m",
+            "1d",
+            "1wk",
+        ]
+    else:
+        interval_options = [
+            "1d",
+            "1wk",
+        ]
+
     # The select box containing all of the options for the interval, which will then be passed in the request to yahoo finance
     interval = st.sidebar.selectbox(
         "Please select an interval from the options below",
@@ -226,9 +259,9 @@ def Stock_Charting():
         help="The interval is the gap between price quotes. Xm = minutes, Xd = days, Xwk = weeks",
     )
 
-    # If statment that outputs error if any date is in the future
+    # If statement that outputs error if any date is in the future
     if start_date > date.today() or end_date > date.today():
-        st.error("Nice try 🦡 ! Dates cannot be in the future")
+        st.error("Nice try! Dates cannot be in the future")
     # If statement to check that the start date is before the end date
     elif start_date > end_date:
         # Error message telling the user to input valid dates
@@ -236,51 +269,75 @@ def Stock_Charting():
 
     # The request to yahoo finance. The response is a pandas DataFrame and is consequently stored under the name df, meaning dataframe.
     df = yf.download(tickers=ticker, start=start_date, end=end_date, interval=interval)
-
-    # Checkbox that when ticked will bring up the historical price data of the stock.
-    if st.checkbox("View historical stock price data"):
-        # Embedding the data frame containing the stock price data into the webpage
-        st.dataframe(df)
-
-   
-
-    #df['date'] = pd.to_datetime(df['date'])
+    # df = web.DataReader(ticker,'yahoo', start_date, end_date)
 
     st.sidebar.write("Select a chart type:")
 
+    # Setting the deafault chart type to line
     chart_type = "line"
+
+    # Additional things to add to the toolbar on the chart
+    chart_config = {
+        "modeBarButtonsToAdd": [
+            "drawline",
+            "drawopenpath",
+            "drawclosedpath",
+            "drawcircle",
+            "drawrect",
+            "eraseshape",
+        ]
+    }
 
     if st.sidebar.checkbox("Candlestick Chart"):
         chart_type = "Candlestick"
     elif st.sidebar.checkbox("OHLC chart"):
         chart_type = "Ohlc"
 
-    if st.checkbox("Show chart"):
-        if chart_type == "line":
-            st.line_chart(df["Adj Close"])
-        elif chart_type == "Candlestick":
-            fig = go.Figure(
-                data=go.Candlestick(
-                    x=df.index,
-                    open=df["Open"],
-                    high=df["High"],
-                    low=df["Low"],
-                    close=df["Close"],
-                )
-            )
-            st.plotly_chart(fig, use_container_width=True)
+    fig = make_subplots(
+        rows=4,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.1,
+        row_heights=[5, 1.5, 1.5, 2.5],
+        subplot_titles=(
+            f"{chart_type} chart of {ticker}'s share price",
+            "Volume",
+            "RSI",
+            "MACD",
+        ),
+    )
+
+    chart = PriceCharting(fig, df, interval)
+    chart_indicators = indicators(fig, df)
+
+    df = chart_indicators.RSIcalc()
+    df = chart_indicators.MACDcalc()
+
+    # Checkbox that when ticked will bring up the historical price data of the stock.
+    if st.checkbox("View historical stock price data"):
+        # Embedding the data frame containing the stock price data into the webpage
+        data_table = st.dataframe(df)
+
+        # Default Line chart
+    if chart_type == "line":
+        st.line_chart(df["Adj Close"])
+
+    else:
+        if chart_type == "Candlestick":
+            # Creating a candlestick chart
+            fig = chart.Candlestick_chart()
 
         elif chart_type == "Ohlc":
-            fig = go.Figure(
-                data=go.Ohlc(
-                    x=df.index,
-                    open=df["Open"],
-                    high=df["High"],
-                    low=df["Low"],
-                    close=df["Close"],
-                )
-            )
-            st.plotly_chart(fig, use_container_width=True)
+            # creating an Ohlc chart
+            fig = chart.OHLC_chart()
+
+        fig = chart.Volume_chart()
+        fig = chart_indicators.MA20()
+        fig = chart_indicators.MA60()
+        fig = chart_indicators.RSIplot()
+        fig = chart_indicators.MACDplot()
+
+        st.plotly_chart(fig, use_container_width=True, config=chart_config)
 
 
 def main():
@@ -306,14 +363,25 @@ def main():
         # The function responsable for stock charting is called
         Stock_Charting()
     elif menu_select == "Reddit Trending Stocks":
-        # The function responsable for Treding reddit stocks is called
+        # getting the data
         pass
+        tickers_arr, mentions_arr = getData()
+
+        if st.checkbox("Get data"):
+
+            st.write(pd.DataFrame({
+                'tickers': tickers_arr,
+                'mentions': mentions_arr
+            }))
+
+        if st.checkbox("Show bar chart"):
+            Reddit_BarChart(tickers_arr,mentions_arr)
 
     elif menu_select == "Financial News":
-        # The function responable for the Financial News is called
-        pass
+        # The function responsible for the Financial News is called
+        get_news()
+        
 
 
 if __name__ == "__main__":
     main()
-
