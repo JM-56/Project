@@ -3,3 +3,6 @@ streamlit
 praw
 yfinance
 plotly
+math
+operator
+beautifulsoup4
