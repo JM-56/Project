@@ -147,8 +147,8 @@ def MainMenu():
 
     st.header("**How to use the site**")
 
-    if st.checkbox("Show more text"):
-        st.write(
+    
+     st.write(
             """
         **Sidebar**
 
@@ -164,7 +164,7 @@ def MainMenu():
         should be input. An example of this can be seen below.
 
         """
-        )
+      )
 
     demo_text = st.text_input("foobar", help="This is some more info")
 
