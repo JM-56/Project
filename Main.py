@@ -15,7 +15,6 @@ st.set_page_config(
     page_title="Financial Dash",
     page_icon="🦧",
     layout="wide",
-    initial_sidebar_state="collapsed",
 )
 
 # Function to find the difference between 2 dates
