@@ -149,7 +149,7 @@ def MainMenu():
 
     
      st.write(
-            """
+     """
         **Sidebar**
 
         In the top left of this webpage, you will see an arrow. Clicking on this brings out the sidebar. It is through this that you will navigate throughout the 
@@ -163,8 +163,8 @@ def MainMenu():
         Next to some inputs/buttons, you may see a '?', upon hovering over this, some text will appear which can tell you a little more about what something is or what 
         should be input. An example of this can be seen below.
 
-        """
-      )
+      """
+     )
 
     demo_text = st.text_input("foobar", help="This is some more info")
 
