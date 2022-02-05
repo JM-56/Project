@@ -363,7 +363,6 @@ def main():
         Stock_Charting()
     elif menu_select == "Reddit Trending Stocks":
         # getting the data
-        pass
         tickers_arr, mentions_arr = getData()
 
         if st.checkbox("Get data"):
