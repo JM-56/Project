@@ -301,8 +301,8 @@ def Stock_Charting():
         subplot_titles=(
             f"{chart_type} chart of {ticker}'s share price",
             "Volume",
-            "RSI",
-            "MACD",
+            "Relative Strength Index",
+            "Moving Average Convergence Divergence",
         ),
     )
 
