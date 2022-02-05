@@ -362,6 +362,10 @@ def main():
         # The function responsable for stock charting is called
         Stock_Charting()
     elif menu_select == "Reddit Trending Stocks":
+        st.write("""
+        Due to the very nature of this section of the page there will be some slight delays with these functions. However, they
+        should take no longer than 15 seconds to execute, so if they do please refresh the page and try again.
+        """)
          # getting the data
         tickers_arr, mentions_arr = getData()
         if st.checkbox("Get data"): 
