@@ -12,6 +12,7 @@ reddit = praw.Reddit(
 )
 
 #Function to get the tickers and their number of mentions
+@st.cache
 def getData():
 
     #Getting the last 500 posts in wallstreetbets
