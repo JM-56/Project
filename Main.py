@@ -368,12 +368,6 @@ def main():
         """)
          # getting the data
         tickers_arr, mentions_arr = getData()
-        if st.checkbox("Get data"): 
-            st.write(pd.DataFrame({
-                'tickers': tickers_arr,
-                'mentions': mentions_arr
-            }))
-
         if st.checkbox("Show bar chart"):
             Reddit_BarChart(tickers_arr,mentions_arr)
 
