@@ -362,11 +362,10 @@ def main():
         # The function responsable for stock charting is called
         Stock_Charting()
     elif menu_select == "Reddit Trending Stocks":
-        # getting the data
-        tickers_arr, mentions_arr = getData()
-
         if st.checkbox("Get data"):
-
+            # getting the data
+            tickers_arr, mentions_arr = getData()
+            
             st.write(pd.DataFrame({
                 'tickers': tickers_arr,
                 'mentions': mentions_arr
