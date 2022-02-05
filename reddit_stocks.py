@@ -50,7 +50,8 @@ def getData():
     
     #Adding each ticker to the tickers array and its mentions to the mention array
     for x in sorted_stock_dict:
-        tickers.append(x)
+        stock = x.replace("$","")
+        tickers.append(stock)
         mentions.append(sorted_stock_dict[x])
 
     #Return tickers and mentions array
