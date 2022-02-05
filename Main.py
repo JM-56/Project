@@ -1,4 +1,3 @@
-import time
 import datetime
 from datetime import date
 from plotly.subplots import make_subplots
@@ -363,7 +362,6 @@ def main():
         # The function responsable for stock charting is called
         Stock_Charting()
     elif menu_select == "Reddit Trending Stocks":
-        time.sleep(5)
          # getting the data
         tickers_arr, mentions_arr = getData()
         if st.checkbox("Get data"): 
