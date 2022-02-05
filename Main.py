@@ -1,3 +1,4 @@
+import time
 import datetime
 from datetime import date
 from plotly.subplots import make_subplots
